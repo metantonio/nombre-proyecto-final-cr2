@@ -1,7 +1,7 @@
-rm -R -f ./migrations &&
-pipenv run init &&
-dropdb -h localhost -U gitpod example || true &&
-createdb -h localhost -U gitpod example || true &&
-psql -h localhost example -U gitpod -c 'CREATE EXTENSION unaccent;' || true &&
-pipenv run migrate &&
+rmdir "./migrations" -Force -Recurse
+echo rm -R -f ./migrations
+pipenv run init
+mysql -u root -p -e "DROP DATABASE example;"
+mysql -u root -p -e "CREATE DATABASE example;"
+pipenv run migrate
 pipenv run upgrade
