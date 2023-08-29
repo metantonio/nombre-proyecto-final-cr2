@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+mysql-connector-python = "*"
+mysqlclient = "*"
 flask = "*"
 sqlalchemy = "==1.4.46"
 flask-sqlalchemy = "*"
@@ -30,5 +32,5 @@ local="heroku local"
 upgrade="flask db upgrade"
 downgrade="flask db downgrade"
 insert-test-data="flask insert-test-data"
-reset_db="bash ./docs/assets/reset_migrations.bash"
+reset_db="@powershell -noninteractive -nologo -noprofile -executionpolicy bypass './docs/assets/reset_migrations.ps1'"
 deploy="echo 'Please follow this 3 steps to deploy: https://github.com/4GeeksAcademy/flask-rest-hello/blob/master/README.md#deploy-your-website-to-heroku' "
