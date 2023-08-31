@@ -27,10 +27,12 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 bcrypt = Bcrypt(app) #instancia de bcrypt
+app.bcrypt = bcrypt
 
 # Setup the Flask-JWT-Extended extension
 app.config["JWT_SECRET_KEY"] = os.getenv("FLASK_JWT_KEY")  # Change this!
 jwt = JWTManager(app)
+#app.jwt = jwt
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
