@@ -59,3 +59,28 @@ def user_register():
     except Exception as error:
         print(str(error))
         return jsonify({"message":"error al almacenar en BD"}), 500
+
+@api.route("/login", methods=["POST"])
+def login():
+    body = request.get_json()
+    email = body["email"]
+    password = body["password"]
+
+    if body is None:
+        raise APIException("Body está vacío", status_code=400)
+    if email is None or email=="":
+        raise APIException("El email es necesario", status_code=400)
+    if password is None or password=="":
+        raise APIException("El password es necesario", status_code=400)
+    
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        raise APIException("El usuario o el password son incorrectos", status_code=400)
+   
+    coincidencia = current_app.bcrypt.check_password_hash(user.password,password) #si coincide, devuelve True
+
+    if not coincidencia:
+        raise APIException("El usuario o el password son incorrectos", status_code=400)
+    
+    access_token = create_access_token(identity=email)
+    return jsonify({"token":access_token}), 200

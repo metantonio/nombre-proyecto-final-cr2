@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
-const SignUp = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { store, actions } = useContext(Context);
@@ -28,7 +28,7 @@ const SignUp = () => {
       password: password,
     };
 
-    let response = await actions.fetchPromise("/api/signup", "POST", obj);
+    let response = await actions.fetchPromise("/api/login", "POST", obj);
 
     if (response.ok) {
       let responseJson = await response.json();
@@ -40,7 +40,8 @@ const SignUp = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-      navigate("/login"); // history.push("/")
+      actions.activateLoginConfirmation();
+      navigate("/inventada"); // history.push("/")
     } else {
       let responseJson = await response.json();
       console.log(responseJson);
@@ -87,7 +88,7 @@ const SignUp = () => {
         </div>
         <div className="row d-flex">
           <button type="button" onClick={register}>
-            Registrar
+            Login
           </button>
         </div>
       </div>
@@ -95,4 +96,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Login;

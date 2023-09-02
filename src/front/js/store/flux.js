@@ -13,7 +13,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			loginConfirmation: false
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -73,6 +74,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 				let response = await fetch(url, obj)
 				return response
 
+			},
+			activateLoginConfirmation: () => {
+				const store = getStore();
+				const actions =getActions();
+
+				setStore({...store, loginConfirmation: true})
+			},
+			deactivateLoginConfirmation: () => {
+				const store = getStore();
+				const actions =getActions();
+
+				setStore({...store, loginConfirmation: false})
 			}
 		}
 	};
