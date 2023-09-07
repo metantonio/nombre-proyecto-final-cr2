@@ -19,6 +19,10 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+import cloudinary
+import cloudinary.uploader
+
+
 #from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -33,6 +37,15 @@ app.bcrypt = bcrypt
 app.config["JWT_SECRET_KEY"] = os.getenv("FLASK_JWT_KEY")  # Change this!
 jwt = JWTManager(app)
 #app.jwt = jwt
+
+#clodinary settings
+cloudinary.config( 
+  cloud_name = os.getenv("CLOUD_NAME"), 
+  api_key = os.getenv("API_KEY"), 
+  api_secret = os.getenv("API_SECRET"),
+  secure = True 
+)
+app.cloudinary = cloudinary
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")

@@ -17,12 +17,14 @@ from datetime import datetime
 from email.mime.base import MIMEBase
 from email import encoders
 
+
 smtp_address = os.getenv("SMTP_ADDRESS")
 smtp_port = os.getenv("SMTP_PORT")
 email_address = os.getenv("EMAIL_ADDRESS")
 email_password = os.getenv("EMAIL_PASSWORD")
 
 api = Blueprint('api', __name__)
+
 
 
 def send_email(asunto, destinatario, body):
@@ -134,7 +136,7 @@ def login():
         raise APIException("El usuario o el password son incorrectos", status_code=400)
     
     access_token = create_access_token(identity=email)
-    return jsonify({"token":access_token}), 200
+    return jsonify({"token":access_token, "message":"login correcto"}), 200
 
 
 @api.route("/sendmail", methods=["POST"])
@@ -151,3 +153,32 @@ def endpoint_mail():
     else:
         return jsonify({"message":"error sending mail"}), 400
 
+
+@api.route('/user/upload-image', methods=['PUT'])
+@jwt_required()
+def handle_upload():
+
+    # validate that the front-end request was built correctly
+    if 'profile_image' in request.files:
+        print("request.files: ", request.files)
+        print("request.form.info: ", request.form["info"])
+
+        # upload file to uploadcare
+        result = current_app.cloudinary.uploader.upload(request.files['profile_image'])
+        print(result)
+        #obtain user identity
+        identity = get_jwt_identity()
+        print(identity)
+
+        # fetch for the user
+        user1 = User.query.filter_by(email=identity).first()
+
+        # update the user with the given cloudinary image URL
+        user1.profile_image_url = result['secure_url']
+
+        db.session.add(user1)
+        db.session.commit()
+
+        return jsonify(user1.serialize()), 200
+    else:
+        raise APIException('Missing profile_image on the FormData')

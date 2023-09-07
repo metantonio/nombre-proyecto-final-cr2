@@ -40,6 +40,7 @@ const Login = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+      localStorage.setItem("token", responseJson.token);
       actions.activateLoginConfirmation();
       navigate("/inventada"); // history.push("/")
     } else {
