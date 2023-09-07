@@ -160,15 +160,15 @@ def handle_upload():
 
     # validate that the front-end request was built correctly
     if 'profile_image' in request.files:
-        print("request.files: ", request.files)
-        print("request.form.info: ", request.form["info"])
+        #print("request.files: ", request.files)
+        #print("request.form.info: ", request.form["info"])
 
         # upload file to uploadcare
         result = current_app.cloudinary.uploader.upload(request.files['profile_image'])
-        print(result)
+        #print(result)
         #obtain user identity
         identity = get_jwt_identity()
-        print(identity)
+        #print(identity)
 
         # fetch for the user
         user1 = User.query.filter_by(email=identity).first()
