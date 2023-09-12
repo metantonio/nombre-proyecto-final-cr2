@@ -2,11 +2,11 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, User
+from api.models import db, User, TokenBlocked
 from api.utils import generate_sitemap, APIException
 
 from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, get_jwt
 from flask_jwt_extended import jwt_required
 
 import smtplib, ssl
@@ -67,9 +67,23 @@ def send_email(asunto, destinatario, body):
         return False
 
 
+def verifyToken(jti):
+    search = TokenBlocked.query.filter_by(token=jti).first()
+    
+    if search == None:
+        return True #para este caso el token no estaría en la lista de bloqueados
+    else:
+        return False #para este caso el token sí estaría en la lista de bloqueados
+
+
 
 @api.route('/hello', methods=['POST', 'GET'])
+@jwt_required()
 def handle_hello():
+
+    verification = verifyToken(get_jwt()["jti"])
+    if verification == False:
+        return jsonify({"message":"forbidden"}), 403 
 
     response_body = {
         "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
@@ -182,3 +196,24 @@ def handle_upload():
         return jsonify(user1.serialize()), 200
     else:
         raise APIException('Missing profile_image on the FormData')
+
+
+@api.route("/logout", methods=["POST"])
+@jwt_required()
+def logout():
+    try:
+        jti = get_jwt()["jti"]
+        identity = get_jwt_identity() #asociada al correo
+        print("jti: ", jti)
+        new_register =  TokenBlocked(token=jti, email= identity) #creamos una instancia de la clase TokenBlocked
+
+        db.session.add(new_register)
+        db.session.commit()
+
+        return jsonify({"message":"logout succesfully"}), 200
+    
+    except Exception as error:
+        print(str(error))
+        return jsonify({"message":"error trying to logout"}), 403
+
+
